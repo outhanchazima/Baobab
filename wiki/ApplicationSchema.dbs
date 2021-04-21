@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="PostgreSQL" id="Project_1403" database="PostgreSQL" >
+	<schema name="public" >
+		<udt name="event_type" udt_java_type="12" udt_precision="NONE" >
+			<udt_script><![CDATA[CREATE TYPE ${schema}.${name} AS ENUM ( 'AWARD', 'EVENT'  )]]></udt_script>
+		</udt>
+		<udt name="event_type" udt_java_type="12" udt_precision="NONE" >
+			<udt_script><![CDATA[CREATE TYPE ${schema}.${name} AS ENUM ( 'CALL' )]]></udt_script>
+		</udt>
+		<udt name="outcome_status" udt_java_type="12" udt_precision="NONE" >
+			<udt_script><![CDATA[CREATE TYPE ${schema}.${name} AS ENUM ( 'ACCEPTED', 'REJECTED' , 'WAITLIST'  )]]></udt_script>
+		</udt>
+		<table name="answer" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="response_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="question_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="value" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<index name="answer_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="answer_question_id_fkey" to_schema="public" to_table="question" >
+				<fk_column name="question_id" pk="id" />
+			</fk>
+			<fk name="answer_response_id_fkey" to_schema="public" to_table="response" >
+				<fk_column name="response_id" pk="id" />
+			</fk>
+		</table>
+		<table name="application_form" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="event_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="is_open" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="nominations" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<index name="application_form_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="question" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="application_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="section_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="type" type="varchar" length="25" decimal="0" jt="12" mandatory="y" />
+			<column name="order" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="is_required" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="depends_on_question_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="key" type="varchar" length="255" decimal="0" jt="12" />
+			<index name="question_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="question_application_form_id_fkey" to_schema="public" to_table="application_form" >
+				<fk_column name="application_form_id" pk="id" />
+			</fk>
+			<fk name="question_depends_on_question_id_fkey" to_schema="public" to_table="question" >
+				<fk_column name="depends_on_question_id" pk="id" />
+			</fk>
+			<fk name="question_section_id_fkey" to_schema="public" to_table="section" >
+				<fk_column name="section_id" pk="id" />
+			</fk>
+		</table>
+		<table name="question_translation" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="question_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="varchar" decimal="0" jt="12" />
+			<column name="headline" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<column name="placeholder" type="varchar" decimal="0" jt="12" />
+			<column name="validation_regex" type="varchar" decimal="0" jt="12" />
+			<column name="validation_text" type="varchar" decimal="0" jt="12" />
+			<column name="options" type="json" decimal="0" jt="2000" />
+			<column name="show_for_values" type="json" decimal="0" jt="2000" />
+			<index name="question_translation_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_question_id_language" unique="UNIQUE_KEY" >
+				<column name="question_id" />
+				<column name="language" />
+			</index>
+			<fk name="question_translation_question_id_fkey" to_schema="public" to_table="question" >
+				<fk_column name="question_id" pk="id" />
+			</fk>
+		</table>
+		<table name="response" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="application_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="is_submitted" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="submitted_timestamp" type="timestamp" length="0" decimal="6" jt="93" />
+			<column name="is_withdrawn" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="withdrawn_timestamp" type="timestamp" length="0" decimal="6" jt="93" />
+			<column name="started_timestamp" type="timestamp" length="0" decimal="6" jt="93" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<index name="response_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="response_application_form_id_fkey" to_schema="public" to_table="application_form" >
+				<fk_column name="application_form_id" pk="id" />
+			</fk>
+		</table>
+		<table name="response_reviewer" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="response_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="reviewer_user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="active" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<index name="response_reviewer_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="response_reviewer_response_id_fkey" to_schema="public" to_table="response" >
+				<fk_column name="response_id" pk="id" />
+			</fk>
+		</table>
+		<table name="response_tag" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="response_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="tag_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="response_tag_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="response_tag_response_id_fkey" to_schema="public" to_table="response" >
+				<fk_column name="response_id" pk="id" />
+			</fk>
+			<fk name="response_tag_tag_id_fkey" to_schema="public" to_table="tag" >
+				<fk_column name="tag_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_configuration" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="num_reviews_required" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="num_optional_reviews" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="drop_optional_question_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="drop_optional_agreement_values" type="varchar" decimal="0" jt="12" />
+			<index name="review_configuration_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="review_configuration_review_form_id_fkey" to_schema="public" to_table="review_form" >
+				<fk_column name="review_form_id" pk="id" />
+			</fk>
+			<fk name="review_configuration_drop_optional_question_id_fkey" to_schema="public" to_table="review_question" >
+				<fk_column name="drop_optional_question_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_form" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="application_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="is_open" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="deadline" type="timestamp" length="0" decimal="6" jt="93" mandatory="y" />
+			<index name="review_form_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="review_form_application_form_id_fkey" to_schema="public" to_table="application_form" >
+				<fk_column name="application_form_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_question" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="question_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="type" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<column name="is_required" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="order" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="weight" type="float8" length="17" decimal="17" jt="6" mandatory="y" />
+			<column name="review_section_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="review_question_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="review_question_question_id_fkey" to_schema="public" to_table="question" >
+				<fk_column name="question_id" pk="id" />
+			</fk>
+			<fk name="review_question_review_section_id_fkey" to_schema="public" to_table="review_section" >
+				<fk_column name="review_section_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_question_translation" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_question_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="varchar" decimal="0" jt="12" />
+			<column name="headline" type="varchar" decimal="0" jt="12" />
+			<column name="placeholder" type="varchar" decimal="0" jt="12" />
+			<column name="options" type="json" decimal="0" jt="2000" />
+			<column name="validation_regex" type="varchar" decimal="0" jt="12" />
+			<column name="validation_text" type="varchar" decimal="0" jt="12" />
+			<index name="review_question_translation_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_review_question_id_language" unique="UNIQUE_KEY" >
+				<column name="review_question_id" />
+				<column name="language" />
+			</index>
+			<fk name="review_question_translation_review_question_id_fkey" to_schema="public" to_table="review_question" >
+				<fk_column name="review_question_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_response" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="reviewer_user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="response_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="submitted_timestamp" type="timestamp" length="0" decimal="6" jt="93" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<column name="is_submitted" type="boolean" length="1" decimal="0" jt="-7" mandatory="y" />
+			<index name="review_response_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="review_response_response_id_fkey" to_schema="public" to_table="response" >
+				<fk_column name="response_id" pk="id" />
+			</fk>
+			<fk name="review_response_review_form_id_fkey" to_schema="public" to_table="review_form" >
+				<fk_column name="review_form_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_score" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_response_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_question_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="value" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<index name="review_score_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="review_score_review_question_id_fkey" to_schema="public" to_table="review_question" >
+				<fk_column name="review_question_id" pk="id" />
+			</fk>
+			<fk name="review_score_review_response_id_fkey" to_schema="public" to_table="review_response" >
+				<fk_column name="review_response_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_section" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="order" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="review_section_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="review_section_review_form_id_fkey" to_schema="public" to_table="review_form" >
+				<fk_column name="review_form_id" pk="id" />
+			</fk>
+		</table>
+		<table name="review_section_translation" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="review_section_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<column name="headline" type="varchar" decimal="0" jt="12" />
+			<column name="description" type="varchar" decimal="0" jt="12" />
+			<index name="review_section_translation_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_review_section_id_language" unique="UNIQUE_KEY" >
+				<column name="review_section_id" />
+				<column name="language" />
+			</index>
+			<fk name="review_section_translation_review_section_id_fkey" to_schema="public" to_table="review_section" >
+				<fk_column name="review_section_id" pk="id" />
+			</fk>
+		</table>
+		<table name="section" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="application_form_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="order" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="depends_on_question_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="key" type="varchar" length="255" decimal="0" jt="12" />
+			<index name="section_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="section_application_form_id_fkey" to_schema="public" to_table="application_form" >
+				<fk_column name="application_form_id" pk="id" />
+			</fk>
+			<fk name="section_depends_on_question_id_fkey" to_schema="public" to_table="question" >
+				<fk_column name="depends_on_question_id" pk="id" />
+			</fk>
+		</table>
+		<table name="section_translation" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="section_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<column name="name" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<column name="show_for_values" type="json" decimal="0" jt="2000" />
+			<index name="section_translation_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_section_id_language" unique="UNIQUE_KEY" >
+				<column name="section_id" />
+				<column name="language" />
+			</index>
+			<fk name="section_translation_section_id_fkey" to_schema="public" to_table="section" >
+				<fk_column name="section_id" pk="id" />
+			</fk>
+		</table>
+		<table name="tag" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="event_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="tag_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="tag_translation" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="tag_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="language" type="varchar" length="2" decimal="0" jt="12" mandatory="y" />
+			<column name="name" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<index name="tag_translation_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_tag_id_language" unique="UNIQUE_KEY" >
+				<column name="tag_id" />
+				<column name="language" />
+			</index>
+			<fk name="tag_translation_tag_id_fkey" to_schema="public" to_table="tag" >
+				<fk_column name="tag_id" pk="id" />
+			</fk>
+		</table>
+	</schema>
+	<connector name="PostgreSQL" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.2.18.jar" driver_desc="Standard" host="localhost" port="5432" instance="docker" user="docker" passwd="ZG9ja2Vy" />
+	<layout name="Layout with Tools" id="Layout_1269" show_column_type="y" show_relation="columns" >
+		<entity schema="public" name="answer" color="C7F4BE" x="400" y="1120" />
+		<entity schema="public" name="application_form" color="C7F4BE" x="416" y="64" />
+		<entity schema="public" name="question" color="C7F4BE" x="400" y="544" />
+		<entity schema="public" name="question_translation" color="C7F4BE" x="80" y="528" />
+		<entity schema="public" name="response" color="BED3F4" x="368" y="832" />
+		<entity schema="public" name="response_reviewer" color="BED3F4" x="48" y="848" />
+		<entity schema="public" name="response_tag" color="BED3F4" x="64" y="1088" />
+		<entity schema="public" name="review_configuration" color="F4DDBE" x="1248" y="48" />
+		<entity schema="public" name="review_form" color="F4DDBE" x="896" y="48" />
+		<entity schema="public" name="review_question" color="F4DDBE" x="864" y="512" />
+		<entity schema="public" name="review_question_translation" color="F4DDBE" x="1248" y="512" />
+		<entity schema="public" name="review_response" color="BED3F4" x="832" y="848" />
+		<entity schema="public" name="review_score" color="BED3F4" x="864" y="1120" />
+		<entity schema="public" name="review_section" color="F4DDBE" x="880" y="304" />
+		<entity schema="public" name="review_section_translation" color="F4DDBE" x="1248" y="320" />
+		<entity schema="public" name="section" color="C7F4BE" x="384" y="320" />
+		<entity schema="public" name="section_translation" color="C7F4BE" x="96" y="320" />
+		<entity schema="public" name="tag" color="BED3F4" x="80" y="1264" />
+		<entity schema="public" name="tag_translation" color="BED3F4" x="48" y="1424" />
+		<script name="Sample SQL Editor" id="Editor_207" language="SQL" >
+			<string><![CDATA[SELECT id, application_form_id, section_id, "type", "order", is_required, depends_on_question_id, "key"
+FROM
+	"public".question n;]]></string>
+		</script>
+		<browser id="Browse_115" name="Sample Relational Data Explorer" confirm_updates="y" >
+			<browse_table schema="public" entity="question" x="20" y="20" width="400" height="300" >
+				<browse_table schema="public" entity="answer" fk="answer_question_id_fkey" x="440" y="20" width="500" height="350" >
+					<browse_table schema="public" entity="response" fk="answer_response_id_fkey" x="960" y="20" width="500" height="350" record_view="y" />
+				</browse_table>
+			</browse_table>
+		</browser>
+		<query id="Query_243a" name="Sample Query Builder" >
+			<query_table schema="public" name="question" alias="q" x="48" y="48" >
+				<column name="id" />
+				<column name="application_form_id" />
+				<column name="section_id" />
+				<column name="type" />
+				<column name="order" />
+				<column name="is_required" />
+				<column name="depends_on_question_id" />
+				<column name="key" />
+				<query_table schema="public" name="answer" alias="a" x="288" y="48" fk="answer_question_id_fkey" type="Inner Join" >
+					<column name="id" />
+					<column name="response_id" />
+					<column name="question_id" />
+					<column name="value" />
+					<query_table schema="public" name="response" alias="r" x="464" y="48" fk="answer_response_id_fkey" type="Inner Join" >
+						<column name="id" />
+						<column name="application_form_id" />
+						<column name="user_id" />
+						<column name="is_submitted" />
+						<column name="submitted_timestamp" />
+						<column name="is_withdrawn" />
+						<column name="withdrawn_timestamp" />
+						<column name="started_timestamp" />
+						<column name="language" />
+					</query_table>
+				</query_table>
+			</query_table>
+		</query>
+		<form name="Sample Report" id="Report_243" template="Wide Page" view="frame" >
+			<var name="samplePageNumber" type="4" value="0" mandatory="n" />
+			<var name="sampleRecordsPerPage" type="4" value="100" mandatory="n" />
+			<body name="Body" template="Grid" pos="0,0,0,0,f,f" layout="{{-2,-2,-2,-2,-1},{-2,-2,-2}}" scroll="n" html="n" >
+				<cell type="label" name="sample" template="H3" pos="0,0,1,0,l,c" />
+				<tableview name="sample" template="Table" css="table table-striped table-bordered table-sm table-hover" pos="0,1,4,1,f,f" layout="{{-2,-2,-2,-2,-2,-2,-2,-2},{-2,-2}}" scroll="n" html="n" header_rows="1" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="id" type="4" />
+						<var name="application_form_id" type="4" />
+						<var name="section_id" type="4" />
+						<var name="type" type="-1" />
+						<var name="order" type="4" />
+						<var name="is_required" type="-7" />
+						<var name="depends_on_question_id" type="4" />
+						<var name="key" type="-1" />
+						<script ><![CDATA[SELECT * FROM "public".question]]></script>
+					</form_script>
+					<cell type="label" name="id" pos="0,0,0,0,c,c" />
+					<cell type="label" name="application_form_id" pos="1,0,1,0,c,c" />
+					<cell type="label" name="section_id" pos="2,0,2,0,c,c" />
+					<cell type="label" name="type" pos="3,0,3,0,c,c" />
+					<cell type="label" name="order" pos="4,0,4,0,c,c" />
+					<cell type="label" name="is_required" pos="5,0,5,0,c,c" />
+					<cell type="label" name="depends_on_question_id" pos="6,0,6,0,c,c" />
+					<cell type="label" name="key" pos="7,0,7,0,c,c" />
+					<cell type="label" name="${id}" template="Plain" pos="0,1,0,1,l,c" />
+					<cell type="label" name="${application_form_id}" template="Plain" pos="1,1,1,1,l,c" />
+					<cell type="label" name="${section_id}" template="Plain" pos="2,1,2,1,l,c" />
+					<cell type="label" name="${type}" template="Plain" pos="3,1,3,1,l,c" />
+					<cell type="label" name="${order}" template="Plain" pos="4,1,4,1,l,c" />
+					<cell type="label" name="${is_required}" template="Plain" pos="5,1,5,1,l,c" />
+					<cell type="label" name="${depends_on_question_id}" template="Plain" pos="6,1,6,1,l,c" />
+					<cell type="label" name="${key}" template="Plain" pos="7,1,7,1,l,c" />
+				</tableview>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="0,2,0,2,l,c" glyph="FA-ANGLE_DOUBLE_LEFT" ref_id="Report_243" >
+					<var name="samplePageNumber" value="0" />
+				</cell>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="1,2,1,2,l,c" glyph="FA-ANGLE_LEFT" ref_id="Report_243" >
+					<var name="samplePageNumber" value="${Math.max(0,samplePageNumber-1)}" />
+				</cell>
+				<cell type="label" name="Page ${samplePageNumber+1}" pos="2,2,2,2,l,c" />
+				<cell type="href" name="" disabled="${!sampleHasNextPage}" pos="3,2,3,2,l,c" glyph="FA-ANGLE_RIGHT" ref_id="Report_243" >
+					<var name="samplePageNumber" value="${( samplePageNumber+1 )}" />
+				</cell>
+			</body>
+		</form>
+	</layout>
+	<layout name="Main Layout" id="Layout_ceb" show_relation="columns" >
+		<entity schema="public" name="answer" color="FF0000" x="1008" y="368" />
+		<entity schema="public" name="application_form" color="C7F4BE" x="64" y="176" />
+		<entity schema="public" name="question" color="C7F4BE" x="672" y="80" />
+		<entity schema="public" name="question_translation" color="C7F4BE" x="704" y="320" />
+		<entity schema="public" name="response" color="FF0000" x="992" y="80" />
+		<entity schema="public" name="response_reviewer" color="BED3F4" x="816" y="624" />
+		<entity schema="public" name="response_tag" color="800080" x="1232" y="624" />
+		<entity schema="public" name="review_configuration" color="F4DDBE" x="48" y="912" />
+		<entity schema="public" name="review_form" color="F4DDBE" x="64" y="624" />
+		<entity schema="public" name="review_question" color="F4DDBE" x="576" y="624" />
+		<entity schema="public" name="review_question_translation" color="F4DDBE" x="544" y="912" />
+		<entity schema="public" name="review_response" color="BED3F4" x="816" y="784" />
+		<entity schema="public" name="review_score" color="BED3F4" x="1008" y="992" />
+		<entity schema="public" name="review_section" color="F4DDBE" x="336" y="624" />
+		<entity schema="public" name="review_section_translation" color="F4DDBE" x="320" y="912" />
+		<entity schema="public" name="section" color="C7F4BE" x="256" y="96" />
+		<entity schema="public" name="section_translation" color="C7F4BE" x="272" y="256" />
+		<entity schema="public" name="tag" color="800080" x="1408" y="624" />
+		<entity schema="public" name="tag_translation" color="800080" x="1392" y="768" />
+		<group name="Reviewer Response" color="ECF0F7" >
+			<entity schema="public" name="review_response" />
+			<entity schema="public" name="review_score" />
+			<entity schema="public" name="response_reviewer" />
+		</group>
+		<group name="Review Form" color="F7F2EC" >
+			<entity schema="public" name="review_question" />
+			<entity schema="public" name="review_form" />
+			<entity schema="public" name="review_section" />
+			<entity schema="public" name="review_configuration" />
+			<entity schema="public" name="review_section_translation" />
+			<entity schema="public" name="review_question_translation" />
+		</group>
+		<group name="Application" color="EEF7EC" >
+			<entity schema="public" name="question" />
+			<entity schema="public" name="section" />
+			<entity schema="public" name="application_form" />
+			<entity schema="public" name="section_translation" />
+			<entity schema="public" name="question_translation" />
+		</group>
+		<group name="User Response" color="FF0000" >
+			<entity schema="public" name="answer" />
+			<entity schema="public" name="response" />
+		</group>
+		<group name="Tag" color="800080" >
+			<entity schema="public" name="response_tag" />
+			<entity schema="public" name="tag" />
+			<entity schema="public" name="tag_translation" />
+		</group>
+	</layout>
+</project>
